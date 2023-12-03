@@ -22,8 +22,8 @@ class UpdateWarehouseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'remainder' => 'required',
-            'price' => 'required|numeric'
+            'remainder' => 'required|numeric|min:0',
+            'price' => 'required|numeric|gt:0'
         ];
     }
 }

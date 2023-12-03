@@ -2,74 +2,83 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use App\Models\ProductMaterial;
+use App\Models\Warehouse;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
-        return Product::all();
+        return ProductResource::collection(Product::all());
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(StoreProductRequest $request)
     {
 
-//        $stock = Mater::create([
-//            'material_id' => $request->material_id,
-//            'remainder' => $request->remainder,
-//            'price' => $request->price,
-//        ]);
-//
-//        $stock->save();
-
+        $store = Product::create([
+            'name' => $request->name,
+            'quantity' => $request->quantity
+        ]);
 
         return response()->json(['success' => true]);
-
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(Product $product)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
     public function edit(Product $product)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(UpdateProductRequest $request, Product $product)
     {
-        //
+
+        $addProduct = Product::where('id', $product->id)->update([
+            'quantity' => $product->quantity + $request->quantity,
+
+        ]);
+
+        $stocks = ProductMaterial::where('product_id', $product->id)->paginate(10)->flatten()->toArray();
+        foreach ($stocks as $key => $stock) {
+            $ware = Warehouse::where('material_id', $stock['material_id'])->paginate(10)->flatten()->toArray();
+            $r = $stock['quantity'] * $request->quantity;
+            if ($ware[0]['remainder'] >= $r){
+                $ware[0]['remainder'] -= $r;
+            }else{
+                $ware[0]['remainder'] = null;
+            }
+//            Warehouse::where('material_id', $stock['material_id'])->update([
+//                'remainder' => $ware[0]['remainder']
+//            ]);
+            dump($ware);
+        }
+
+        if ($addProduct) {
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false]);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(Product $product)
     {
         //

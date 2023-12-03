@@ -9,7 +9,11 @@ class ProductMaterial extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['product_id', 'material_id', 'quantity'];
+    protected $fillable = [
+        'product_id',
+        'material_id',
+        'quantity'
+    ];
 
     public function product()
     {
@@ -20,7 +24,4 @@ class ProductMaterial extends Model
     {
         return $this->belongsTo(Material::class);
     }
-
-
-
 }

@@ -12,11 +12,10 @@ class Material extends Model
     protected $fillable = [
         'product_id',
         'name',
-        'quantity',
         'price'
     ];
 
-    public function ProductMaterial()
+    public function productMaterial()
     {
         return $this->hasMany(ProductMaterial::class);
     }

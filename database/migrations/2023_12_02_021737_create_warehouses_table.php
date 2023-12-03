@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('warehouses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('material_id')->constrained();
-            $table->unsignedBigInteger('remainder');
-            $table->unsignedBigInteger('price');
+            $table->double('remainder');
             $table->timestamps();
         });
     }

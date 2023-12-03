@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ShowWarehouseResource;
+use App\Http\Resources\WarehouseResource;
 use App\Models\Warehouse;
 use App\Http\Requests\StoreWarehouseRequest;
 use App\Http\Requests\UpdateWarehouseRequest;
@@ -13,7 +15,7 @@ class WarehouseController extends Controller
      */
     public function index()
     {
-        return Warehouse::all();
+        return WarehouseResource::collection(Warehouse::all());
     }
 
     /**
@@ -31,13 +33,13 @@ class WarehouseController extends Controller
     {
 
 //        dd($request);
-         $stock = Warehouse::create([
+        $stock = Warehouse::create([
             'material_id' => $request->material_id,
             'remainder' => $request->remainder,
             'price' => $request->price,
         ]);
 
-         $stock->save();
+        $stock->save();
 
 
         return response()->json(['success' => true]);
@@ -48,28 +50,27 @@ class WarehouseController extends Controller
      */
     public function show(Warehouse $warehouse)
     {
-        return $warehouse;
+        return new ShowWarehouseResource($warehouse);
     }
 
     public function update(UpdateWarehouseRequest $request, Warehouse $warehouse)
     {
 
-//        dd($warehouse);
-        $stock = Warehouse::where('id', $warehouse->id)->get();
-
-        $stock->update([
-            'remainder' => $stock->remainder + $request->remainder,
+        $stock = Warehouse::where('id', $warehouse->id)->update([
+            'remainder' => $warehouse->remainder + $request->remainder,
             'price' => $request->price,
         ]);
 
-        dd($stock);
-
-        return response()->json(['success' => true]);
+        if ($stock) {
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false]);
+        }
 
 
     }
 
-        public function destroy(Warehouse $warehouse)
+    public function destroy(Warehouse $warehouse)
     {
         //
     }
